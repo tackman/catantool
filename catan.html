@@ -31,12 +31,13 @@ const ID_WHEET = 4;
 const ID_WOOD = 5;
 const ID_DESERT = 6;
 
+const PROD_OFFSET = 21;
+
 var sprite = new Image();
 
 jQuery(function($){
 
   $("#random").on("click", function(){
-    console.log("on click");
     var res = _.shuffle([1,1,1, 2,2,2, 3,3,3,3, 4,4,4,4, 5,5,5,5, 6]);
     var nums = _.shuffle([0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9]);
     var resStr = "";
@@ -52,7 +53,6 @@ jQuery(function($){
       }
     }
 
-    console.log("res %s num %s", resStr, numStr);
     var portStr = "0ZZ1ZZZ2ZZ0ZZ3ZZ0ZZ4ZZ0ZZ5ZZZZ";
     var hash = resStr + '_' + numStr + '_' + portStr;
     window.location.hash = hash;
@@ -63,7 +63,6 @@ jQuery(function($){
 
     var x = Math.floor((e.pageX-$("#canvas").offset().left));
     var y = Math.floor((e.pageY-$("#canvas").offset().top));
-    console.log("x=" + x + " y=" + y);
 
     if (TILE_Y < y && y < TILE_Y+TILE_Y/2) {
       if (2*TILE_X < x && x < 5*TILE_X) {
@@ -90,7 +89,29 @@ jQuery(function($){
  });
 
   function editAt(pos) {
-    console.log("try to edit at " + pos);
+    var n = parseInt(window.location.hash.charAt(PROD_OFFSET + pos));
+    if (n < 5) {
+      n += 2;
+    } else {
+      n += 3;
+    }
+    var dom = $("#number");
+    dom.prop("disabled", false);
+    dom.prop("value", n);
+    dom.unbind("change");
+    dom.on("change", function(){
+      var input = parseInt(dom.prop("value"));
+      if (_.isNumber(input) && 2 <= input && input <= 12 && input !== 7) {
+        var newNum;
+        if (input < 7) {
+          newNum = input - 2;
+        } else {
+          newNum = input - 3;
+        }
+        window.location.hash = setCharAt(window.location.hash, PROD_OFFSET+pos, newNum);
+        sprite.onload();
+      }
+    });
   }
 });
 
@@ -297,7 +318,6 @@ function draw() {
 
   sprite.onload = function() {
     var map = window.location.hash;
-    console.log(map);
 
     var i = 0;
     var j = 0;
@@ -349,7 +369,6 @@ function draw() {
       if (isNaN(p)) {
         continue;
       }
-      console.log(p);
       var pn = parseInt(p);
       drawPort(i-41, pn);
     }
@@ -357,6 +376,11 @@ function draw() {
   }
 
 
+}
+
+function setCharAt(str, index, chr) {
+    if(index > str.length-1) return str;
+    return str.substr(0,index) + chr + str.substr(index+1);
 }
 
 </script>
@@ -368,6 +392,9 @@ function draw() {
     </div>
     <div>
       <input type="button" value="ランダム配置" id="random" />
+    </div>
+    <div>
+      生産力設定 <input type="text" id="number" disabled="disabled">
     </div>
 
     <pre>
