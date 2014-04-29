@@ -13,12 +13,13 @@
     <script type="text/javascript" src="jquery-2.1.0.min.js"></script>
     <script type="text/javascript">
 
-const TILE_X = 100;
-const TILE_Y = 116;
-const DY = 87;
-const VY = 174;
-const NUM_X = 30;
-const PORT_LINE = 20;
+// 島タイル関係の定数
+const TILE_X = 100; // スプライトのX辺
+const TILE_Y = 116; // スプライトのY変 
+const DY = 87;  // TILE_Y*(3/4) 偶数行の島タイルの上辺のスクリーン上端からのオフセット  
+const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ  
+const NUM_X = 30; // 生産力数字 
+const PORT_LINE = 20; // 港の線の長さ
 const SQRT3 = 1.73;
 // 1辺の長さ＝TILE_Y/2
 
