@@ -32,6 +32,7 @@ const ID_WOOD = 5;
 const ID_DESERT = 6;
 
 const PROD_OFFSET = 21;
+const RES_OFFSET = 1;
 
 var sprite = new Image();
 
@@ -111,6 +112,43 @@ jQuery(function($){
         window.location.hash = setCharAt(window.location.hash, PROD_OFFSET+pos, newNum);
         sprite.onload();
       }
+    });
+
+    var r = parseInt(window.location.hash.charAt(RES_OFFSET + pos));
+    var resDom = $("#resource");
+    resDom.prop("disabled", false);
+    var resName;
+    switch (r) {
+      case ID_SEA:
+        resName = "海";
+        break;
+      case ID_DESERT:
+        resName = "砂漠";
+        break;
+      case ID_WOOD:
+        resName = "木";
+        break;
+      case ID_WHEET:
+        resName = "麦";
+        break;
+      case ID_SHEEP:
+        resName = "羊";
+        break;
+      case ID_IRON:
+        resName = "鉄";
+        break;
+      case ID_CRAY:
+        resName = "土";
+        break;
+      default:
+        console.error("illegal resource id");
+    }
+    resDom.prop("value", r);
+    resDom.unbind("change");
+    resDom.on("change", function(){
+      var input = parseInt(resDom.prop("value"));
+      window.location.hash = setCharAt(window.location.hash, RES_OFFSET + pos, input);
+      sprite.onload();
     });
   }
 });
@@ -395,6 +433,18 @@ function setCharAt(str, index, chr) {
     </div>
     <div>
       生産力設定 <input type="text" id="number" disabled="disabled">
+    </div>
+    <div>
+      資源設定 <select id="resource" disabled="disabled">
+      <option value="0">海</option>
+      <option value="1">土</option>
+      <option value="2">鉄</option>
+      <option value="3">羊</option>
+      <option value="4">麦</option>
+      <option value="5">木</option>
+      <option value="6">砂漠</option>
+
+      </select>
     </div>
 
     <pre>
