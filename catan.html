@@ -21,7 +21,14 @@ const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ
 const NUM_X = 30; // 生産力数字 
 const PORT_LINE = 20; // 港の線の長さ
 const SQRT3 = 1.73;
+const CITY_X = 40;
+const SETTLE_X = 32;
+const PLAYER_PARTS_X = 173;
+const PLAYER_PARTS_Y = 30;
+const PLAYER_SY = 116+30;
 // 1辺の長さ＝TILE_Y/2
+
+const SETTLE_SELECT_RADIUS = 20;
 
 const ID_SEA = 0;
 const ID_CRAY = 1;
@@ -33,6 +40,20 @@ const ID_DESERT = 6;
 
 const PROD_OFFSET = 21;
 const RES_OFFSET = 1;
+
+const ID_RED_SETTLE = 'A';
+const ID_RED_CITY = 'B';
+const ID_BLUE_SETTLE = 'C';
+const ID_BLUE_CITY = 'D';
+const ID_ORANGE_SETTLE = 'E';
+const ID_ORANGE_CITY = 'F';
+const ID_WHITE_SETTLE = 'G';
+const ID_WHITE_CITY = 'H';
+
+const PL_RED = 0;
+const PL_BLUE = 1;
+const PL_ORANGE = 2;
+const PL_WHITE = 3;
 
 var sprite = new Image();
 
@@ -65,6 +86,16 @@ jQuery(function($){
     var x = Math.floor((e.pageX-$("#canvas").offset().left));
     var y = Math.floor((e.pageY-$("#canvas").offset().top));
 
+    var i;
+    var coord;
+    for (i = 0; i < 54; ++i) {
+      coord = getSettleCoordAt(i);
+      if ((x-coord.x)*(x-coord.x) + (y-coord.y)*(y-coord.y) < SETTLE_SELECT_RADIUS * SETTLE_SELECT_RADIUS) {
+        modifySettleAt(i);
+        return;
+      }
+    }
+
     if (TILE_Y < y && y < TILE_Y+TILE_Y/2) {
       if (2*TILE_X < x && x < 5*TILE_X) {
         editAt(Math.floor((x - TILE_X*2)/TILE_X));
@@ -88,6 +119,77 @@ jQuery(function($){
     }
 
  });
+
+  function modifySettleAt(pos) {
+    var pl = $(':radio[name="player"]:checked').val()
+    var splits = window.location.hash.split('_');
+    var map = {};
+    var i;
+
+    for (i = 3; i < splits.length; ++i) {
+      var settle = splits[i];
+      var settlePos = parseInt(settle.substr(1));
+      map[settlePos] = settle;
+    }
+
+    if (pl === "red") {
+      if (_.has(map, pos)) {
+        var settle = map[pos];
+        var type = settle.charAt(0);
+        if (type === ID_RED_SETTLE) {
+          map[pos] = ID_RED_CITY + pos;
+        } else {
+          delete map[pos];
+        }
+      } else {
+        map[pos] = ID_RED_SETTLE + pos;
+      }
+    } else if (pl === "blue") {
+      if (_.has(map, pos)) {
+        var settle = map[pos];
+        var type = settle.charAt(0);
+        if (type === ID_BLUE_SETTLE) {
+          map[pos] = ID_BLUE_CITY + pos;
+        } else {
+          delete map[pos];
+        }
+      } else {
+        map[pos] = ID_BLUE_SETTLE + pos;
+      }
+    } else if (pl === "orange") {
+      if (_.has(map, pos)) {
+        var settle = map[pos];
+        var type = settle.charAt(0);
+        if (type === ID_ORANGE_SETTLE) {
+          map[pos] = ID_ORANGE_CITY + pos;
+        } else {
+          delete map[pos];
+        }
+      } else {
+        map[pos] = ID_ORANGE_SETTLE + pos;
+      }
+    } else if (pl === "white") {
+      if (_.has(map, pos)) {
+        var settle = map[pos];
+        var type = settle.charAt(0);
+        if (type === ID_WHITE_SETTLE) {
+          map[pos] = ID_WHITE_CITY + pos;
+        } else {
+          delete map[pos];
+        }
+      } else {
+        map[pos] = ID_WHITE_SETTLE + pos;
+      }
+    }
+
+    var hash = splits[0] + '_' + splits[1] + '_' + splits[2];
+    for (key in map) {
+      hash += '_' + map[key];
+    }
+
+    window.location.hash = hash;
+    sprite.onload();
+  }
 
   function editAt(pos) {
     var n = parseInt(window.location.hash.charAt(PROD_OFFSET + pos));
@@ -354,6 +456,18 @@ function draw() {
 
   }
 
+  var drawSettlement = function(pos, player, isCity) {
+    var w = isCity ? CITY_X : SETTLE_X;
+    var coord = getSettleCoordAt(pos);
+    var x = coord.x;
+    var y = coord.y;
+    x -= w/2;
+    y -= PLAYER_PARTS_Y/2;
+    ctx.drawImage(sprite, PLAYER_PARTS_X*player + TILE_X + (isCity ? 0 : CITY_X), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        x, y, w, PLAYER_PARTS_Y);
+  }
+
   sprite.onload = function() {
     var map = window.location.hash;
 
@@ -411,6 +525,40 @@ function draw() {
       drawPort(i-41, pn);
     }
 
+    var pos;
+    var plFigure;
+    split = map.split('_');
+    for (i = 3; i < split.length; ++i) {
+      plFigure = split[i];
+      pos = parseInt(plFigure.substr(1));
+      switch (plFigure[0]) {
+        case ID_RED_SETTLE:
+          drawSettlement(pos, PL_RED, false);
+          break;
+        case ID_RED_CITY:
+          drawSettlement(pos, PL_RED , true);
+          break;
+        case ID_BLUE_SETTLE:
+          drawSettlement(pos, PL_BLUE, false);
+          break;
+        case ID_BLUE_CITY:
+          drawSettlement(pos, PL_BLUE, true);
+          break;
+        case ID_ORANGE_SETTLE:
+          drawSettlement(pos, PL_ORANGE, false);
+          break;
+        case ID_ORANGE_CITY:
+          drawSettlement(pos, PL_ORANGE, true);
+          break;
+        case ID_WHITE_SETTLE:
+          drawSettlement(pos, PL_WHITE, false);
+          break;
+        case ID_WHITE_CITY:
+          drawSettlement(pos, PL_WHITE, true);
+          break;
+      }
+    }
+
   }
 
 
@@ -420,6 +568,34 @@ function setCharAt(str, index, chr) {
     if(index > str.length-1) return str;
     return str.substr(0,index) + chr + str.substr(index+1);
 }
+
+function getSettleCoordAt(pos) {
+  var x = 0;
+  var y = 0;
+  if (pos < 7) {
+    x += 2*TILE_X + pos * TILE_X/2;
+    y += (pos % 2 === 0 ? TILE_Y : DY);
+  } else if (pos < 16) {
+    x += 1.5*TILE_X + (pos-7) * TILE_X/2;
+    y += (pos % 2 === 0 ? VY : DY+TILE_Y);
+  } else if (pos < 27) {
+    x += TILE_X + (pos-16) * TILE_X/2;
+    y += (pos % 2 === 0 ? VY + TILE_Y : VY + DY);
+  } else if (pos < 38) {
+    x += TILE_X + (pos-27) * TILE_X/2;
+    y += (pos % 2 === 0 ? VY + TILE_Y + DY : 3*TILE_Y);
+  } else if (pos < 47) {
+    x += 1.5*TILE_X + (pos-38) * TILE_X/2;
+    y += (pos % 2 === 0 ? 2*VY + DY : 2*VY + TILE_Y);
+  } else if (pos < 54) {
+    x += 2*TILE_X + (pos-47) * TILE_X/2;
+    y += (pos % 2 === 0 ? 2*VY+DY+TILE_Y : 3*VY) ;
+  }
+
+  return {x: x, y: y};
+}
+
+
 
 </script>
   </head>
@@ -445,6 +621,15 @@ function setCharAt(str, index, chr) {
       <option value="6">砂漠</option>
 
       </select>
+    </div>
+
+    <div>
+    <form id="player">
+      <input type="radio" name="player" value="red" /><img src="img/red.png" />　
+      <input type="radio" name="player" value="blue" /><img src="img/blue.png" />　
+      <input type="radio" name="player" value="orange" /><img src="img/orange.png" />　
+      <input type="radio" name="player" value="white" /><img src="img/white.png" />
+    </form>
     </div>
 
     <pre>
