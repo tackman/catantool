@@ -21,6 +21,11 @@ const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ
 const NUM_X = 30; // 生産力数字 
 const PORT_LINE = 20; // 港の線の長さ
 const SQRT3 = 1.73;
+const CITY_X = 40;
+const SETTLE_X = 32;
+const PLAYER_PARTS_X = 173;
+const PLAYER_PARTS_Y = 30;
+const PLAYER_SY = 116+30;
 // 1辺の長さ＝TILE_Y/2
 
 const ID_SEA = 0;
@@ -33,6 +38,20 @@ const ID_DESERT = 6;
 
 const PROD_OFFSET = 21;
 const RES_OFFSET = 1;
+
+const ID_RED_SETTLE = 'A';
+const ID_RED_CITY = 'B';
+const ID_BLUE_SETTLE = 'C';
+const ID_BLUE_CITY = 'D';
+const ID_ORANGE_SETTLE = 'E';
+const ID_ORANGE_CITY = 'F';
+const ID_WHITE_SETTLE = 'G';
+const ID_WHITE_CITY = 'H';
+
+const PL_RED = 0;
+const PL_BLUE = 1;
+const PL_ORANGE = 2;
+const PL_WHITE = 3;
 
 var sprite = new Image();
 
@@ -354,6 +373,46 @@ function draw() {
 
   }
 
+  var drawSettlement = function(pos, player, isCity) {
+    console.log(pos);
+    var w = isCity ? CITY_X : SETTLE_X;
+    var coord = getSettleCoordAt(pos);
+    var x = coord.x;
+    var y = coord.y;
+    x -= w/2;
+    y -= PLAYER_PARTS_Y/2;
+    console.log(y);
+    ctx.drawImage(sprite, PLAYER_PARTS_X*player + TILE_X + (isCity ? 0 : CITY_X), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        x, y, w, PLAYER_PARTS_Y);
+  }
+
+  function getSettleCoordAt(pos) {
+    var x = 0;
+    var y = 0;
+    if (pos < 7) {
+      x += 2*TILE_X + pos * TILE_X/2;
+      y += (pos % 2 === 0 ? TILE_Y : DY);
+    } else if (pos < 16) {
+      x += 1.5*TILE_X + (pos-7) * TILE_X/2;
+      y += (pos % 2 === 0 ? VY : DY+TILE_Y);
+    } else if (pos < 27) {
+      x += TILE_X + (pos-16) * TILE_X/2;
+      y += (pos % 2 === 0 ? VY + TILE_Y : VY + DY);
+    } else if (pos < 38) {
+      x += TILE_X + (pos-27) * TILE_X/2;
+      y += (pos % 2 === 0 ? VY + TILE_Y + DY : 3*TILE_Y);
+    } else if (pos < 47) {
+      x += 1.5*TILE_X + (pos-38) * TILE_X/2;
+      y += (pos % 2 === 0 ? 2*VY + DY : 2*VY + TILE_Y);
+    } else if (pos < 54) {
+      x += 2*TILE_X + (pos-47) * TILE_X/2;
+      y += (pos % 2 === 0 ? 2*VY+DY+TILE_Y : 3*VY) ;
+    }
+
+    return {x: x, y: y};
+  }
+
   sprite.onload = function() {
     var map = window.location.hash;
 
@@ -409,6 +468,42 @@ function draw() {
       }
       var pn = parseInt(p);
       drawPort(i-41, pn);
+    }
+
+    var pos;
+    var plFigure;
+    split = map.split('_');
+    for (i = 3; i < split.length; ++i) {
+      plFigure = split[i];
+      pos = parseInt(plFigure.substr(1));
+      console.log(plFigure);
+      console.log(plFigure[0]);
+      switch (plFigure[0]) {
+        case ID_RED_SETTLE:
+          drawSettlement(pos, PL_RED, false);
+          break;
+        case ID_RED_CITY:
+          drawSettlement(pos, PL_RED , true);
+          break;
+        case ID_BLUE_SETTLE:
+          drawSettlement(pos, PL_BLUE, false);
+          break;
+        case ID_BLUE_CITY:
+          drawSettlement(pos, PL_BLUE, true);
+          break;
+        case ID_ORANGE_SETTLE:
+          drawSettlement(pos, PL_ORANGE, false);
+          break;
+        case ID_ORANGE_CITY:
+          drawSettlement(pos, PL_ORANGE, true);
+          break;
+        case ID_WHITE_SETTLE:
+          drawSettlement(pos, PL_WHITE, false);
+          break;
+        case ID_WHITE_CITY:
+          drawSettlement(pos, PL_WHITE, true);
+          break;
+      }
     }
 
   }
