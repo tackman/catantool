@@ -15,7 +15,7 @@
 
 // 島タイル関係の定数
 const TILE_X = 100; // スプライトのX辺
-const TILE_Y = 116; // スプライトのY変 
+const TILE_Y = 116; // スプライトのY辺
 const DY = 87;  // TILE_Y*(3/4) 偶数行の島タイルの上辺のスクリーン上端からのオフセット  
 const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ  
 const NUM_X = 30; // 生産力数字 
@@ -26,6 +26,10 @@ const SETTLE_X = 32;
 const PLAYER_PARTS_X = 173;
 const PLAYER_PARTS_Y = 30;
 const PLAYER_SY = 116+30;
+const ROAD_OFFSET_X = 700;
+const ROAD_OFFSET_Y = 29;
+const ROAD_WIDTH = 10;
+
 // 1辺の長さ＝TILE_Y/2
 
 const SETTLE_SELECT_RADIUS = 20;
@@ -49,6 +53,10 @@ const ID_ORANGE_SETTLE = 'E';
 const ID_ORANGE_CITY = 'F';
 const ID_WHITE_SETTLE = 'G';
 const ID_WHITE_CITY = 'H';
+const ID_RED_ROAD = 'I';
+const ID_BLUE_ROAD = 'J';
+const ID_ORANGE_ROAD = 'K';
+const ID_WHITE_ROAD = 'L';
 
 const PL_RED = 0;
 const PL_BLUE = 1;
@@ -60,6 +68,7 @@ const ABC_OUTER_GRAPH = {0:3, 3:7 , 7:12, 12:16, 16:17, 17:18, 18:15, 15:11, 11:
 const ABC_INNER_GRAPH = {4:8, 8:13, 13:14, 14:10, 10:5, 5:4};
 const ABC_OUTER_INNER_GRAPH = {1:4, 3:8, 12:13, 17:14, 15:10, 6:5};
 const ABC_BEGIN_POS = [0, 2, 7, 11, 16, 18];
+
 
 var sprite = new Image();
 
@@ -535,6 +544,81 @@ function draw() {
         x, y, w, PLAYER_PARTS_Y);
   }
 
+  var drawRoad = function(pos, player) {
+    var coord;
+    var w;
+
+    if (pos < 6) {
+      coord = getSettleCoordAt(pos);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + (pos%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - (pos%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 10) {
+      coord = getSettleCoordAt((pos-6)/2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 18) {
+      coord = getSettleCoordAt(pos - 3);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-10)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-3)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+    } else if (pos < 23) {
+      coord = getSettleCoordAt(7 + (pos-18)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 33) {
+      coord = getSettleCoordAt(pos - 7);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-23)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-23)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 39) {
+      coord = getSettleCoordAt(16 + (pos-33)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 49) {
+      coord = getSettleCoordAt(pos - 12);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-41)%2 === 0 ? TILE_X/2 : 0), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-41)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+    } else if (pos < 54) {
+      coord = getSettleCoordAt(28 + (pos-49)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 62) {
+      coord = getSettleCoordAt(pos - 16);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 66) {
+      coord = getSettleCoordAt(39 + (pos-62)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 72) {
+      coord = getSettleCoordAt(pos - 19);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+
+    }
+    
+  }
+
   sprite.onload = function() {
     var map = window.location.hash;
 
@@ -622,6 +706,18 @@ function draw() {
           break;
         case ID_WHITE_CITY:
           drawSettlement(pos, PL_WHITE, true);
+          break;
+        case ID_RED_ROAD:
+          drawRoad(pos, PL_RED);
+          break;
+        case ID_BLUE_ROAD:
+          drawRoad(pos, PL_BLUE);
+          break;
+        case ID_ORANGE_ROAD:
+          drawRoad(pos, PL_ORANGE);
+          break;
+        case ID_WHITE_ROAD:
+          drawRoad(pos, PL_WHITE);
           break;
       }
     }
