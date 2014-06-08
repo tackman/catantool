@@ -15,7 +15,7 @@
 
 // 島タイル関係の定数
 const TILE_X = 100; // スプライトのX辺
-const TILE_Y = 116; // スプライトのY変 
+const TILE_Y = 116; // スプライトのY辺
 const DY = 87;  // TILE_Y*(3/4) 偶数行の島タイルの上辺のスクリーン上端からのオフセット  
 const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ  
 const NUM_X = 30; // 生産力数字 
@@ -26,7 +26,13 @@ const SETTLE_X = 32;
 const PLAYER_PARTS_X = 173;
 const PLAYER_PARTS_Y = 30;
 const PLAYER_SY = 116+30;
+const ROAD_OFFSET_X = 700;
+const ROAD_OFFSET_Y = 29;
+const ROAD_WIDTH = 10;
 // 1辺の長さ＝TILE_Y/2
+
+const EPSILON = 0.1;
+const DELTA = 10;
 
 const SETTLE_SELECT_RADIUS = 20;
 
@@ -49,6 +55,10 @@ const ID_ORANGE_SETTLE = 'E';
 const ID_ORANGE_CITY = 'F';
 const ID_WHITE_SETTLE = 'G';
 const ID_WHITE_CITY = 'H';
+const ID_RED_ROAD = 'I';
+const ID_BLUE_ROAD = 'J';
+const ID_ORANGE_ROAD = 'K';
+const ID_WHITE_ROAD = 'L';
 
 const PL_RED = 0;
 const PL_BLUE = 1;
@@ -60,6 +70,7 @@ const ABC_OUTER_GRAPH = {0:3, 3:7 , 7:12, 12:16, 16:17, 17:18, 18:15, 15:11, 11:
 const ABC_INNER_GRAPH = {4:8, 8:13, 13:14, 14:10, 10:5, 5:4};
 const ABC_OUTER_INNER_GRAPH = {1:4, 3:8, 12:13, 17:14, 15:10, 6:5};
 const ABC_BEGIN_POS = [0, 2, 7, 11, 16, 18];
+
 
 var sprite = new Image();
 
@@ -156,12 +167,79 @@ jQuery(function($){
     var i;
     var coord;
     for (i = 0; i < 54; ++i) {
+      coordPrev = coord;
       coord = getSettleCoordAt(i);
       if ((x-coord.x)*(x-coord.x) + (y-coord.y)*(y-coord.y) < SETTLE_SELECT_RADIUS * SETTLE_SELECT_RADIUS) {
         modifySettleAt(i);
         return;
       }
     }
+
+
+    var coordNext;
+    var y1,y2;
+
+    var processHorizontalRoad = function(roadOffset, settleOffset, length) {
+      for (i = 0; i < length; ++i) {
+        coord = getSettleCoordAt(i + settleOffset);
+        coordNext = getSettleCoordAt(i + 1 + settleOffset);
+        y1 = coord.y < coordNext.y ? coord.y : coordNext.y;
+        y2 = coord.y > coordNext.y ? coord.y : coordNext.y;
+        if (coord.x < x && x < coordNext.x && y1 < y && y < y2) {
+          modifyRoadAt(i + roadOffset);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    var processVerticalRoad = function(roadOffset, settleOffset, length) {
+      for (i = 0; i < length; i++) {
+        coord = getSettleCoordAt(i*2 + settleOffset);
+        if (coord.y < y && y < coord.y + TILE_Y/2 && (coord.x - DELTA) < x && x < (coord.x + DELTA)) {
+          modifyRoadAt(i + roadOffset);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    if (processHorizontalRoad(0, 0, 6)) {
+      return;
+    }
+    if (processVerticalRoad(6, 0, 4)) {
+      return;
+    }
+    if (processHorizontalRoad(10, 7, 8)) {
+      return;
+    }
+    if (processVerticalRoad(18, 7, 5)) {
+      return;
+    }
+    if (processHorizontalRoad(23, 16, 10)) {
+      return;
+    }
+    if (processVerticalRoad(33, 16, 6)) {
+      return;
+    }
+    if (processHorizontalRoad(39, 27, 10)) {
+      return;
+    }
+    if (processVerticalRoad(49, 28, 5)) {
+      return;
+    }
+    if (processHorizontalRoad(54, 38, 8)) {
+      return;
+    }
+    if (processVerticalRoad(62, 39, 4)) {
+      return;
+    }
+    if (processHorizontalRoad(66, 47, 6)) {
+      return;
+    }
+
 
     if (TILE_Y < y && y < TILE_Y+TILE_Y/2) {
       if (2*TILE_X < x && x < 5*TILE_X) {
@@ -187,71 +265,140 @@ jQuery(function($){
 
  });
 
-  function modifySettleAt(pos) {
+  function modifyRoadAt(pos) {
     var pl = $(':radio[name="player"]:checked').val()
     var splits = window.location.hash.split('_');
-    var map = {};
+    var settleMap = {};
+    var roadMap = {};
     var i;
 
     for (i = 3; i < splits.length; ++i) {
       var settle = splits[i];
+      var c = settle.charAt(0);
       var settlePos = parseInt(settle.substr(1));
-      map[settlePos] = settle;
+
+      if (c === ID_RED_ROAD || c === ID_BLUE_ROAD || c === ID_ORANGE_ROAD || c === ID_WHITE_ROAD) {
+        roadMap[settlePos] = settle;
+      } else {
+        settleMap[settlePos] = settle;
+      }
     }
 
     if (pl === "red") {
-      if (_.has(map, pos)) {
-        var settle = map[pos];
-        var type = settle.charAt(0);
-        if (type === ID_RED_SETTLE) {
-          map[pos] = ID_RED_CITY + pos;
-        } else {
-          delete map[pos];
-        }
+      if (_.has(roadMap, pos)) {
+        delete roadMap[pos];
       } else {
-        map[pos] = ID_RED_SETTLE + pos;
+        roadMap[pos] = ID_RED_ROAD + pos;
       }
     } else if (pl === "blue") {
-      if (_.has(map, pos)) {
-        var settle = map[pos];
-        var type = settle.charAt(0);
-        if (type === ID_BLUE_SETTLE) {
-          map[pos] = ID_BLUE_CITY + pos;
-        } else {
-          delete map[pos];
-        }
+      if (_.has(roadMap, pos)) {
+        delete roadMap[pos];
       } else {
-        map[pos] = ID_BLUE_SETTLE + pos;
+        roadMap[pos] = ID_BLUE_ROAD + pos;
       }
     } else if (pl === "orange") {
-      if (_.has(map, pos)) {
-        var settle = map[pos];
-        var type = settle.charAt(0);
-        if (type === ID_ORANGE_SETTLE) {
-          map[pos] = ID_ORANGE_CITY + pos;
-        } else {
-          delete map[pos];
-        }
+      if (_.has(roadMap, pos)) {
+        delete roadMap[pos];
       } else {
-        map[pos] = ID_ORANGE_SETTLE + pos;
+        roadMap[pos] = ID_ORANGE_ROAD + pos;
       }
     } else if (pl === "white") {
-      if (_.has(map, pos)) {
-        var settle = map[pos];
-        var type = settle.charAt(0);
-        if (type === ID_WHITE_SETTLE) {
-          map[pos] = ID_WHITE_CITY + pos;
-        } else {
-          delete map[pos];
-        }
+      if (_.has(roadMap, pos)) {
+        delete roadMap[pos];
       } else {
-        map[pos] = ID_WHITE_SETTLE + pos;
+        roadMap[pos] = ID_WHITE_ROAD + pos;
       }
     }
 
     var hash = splits[0] + '_' + splits[1] + '_' + splits[2];
-    for (key in map) {
-      hash += '_' + map[key];
+    for (key in roadMap) {
+      hash += '_' + roadMap[key];
+    }
+    for (key in settleMap) {
+      hash += '_' + settleMap[key];
+    }
+
+
+    window.location.hash = hash;
+    sprite.onload();
+
+  }
+
+  function modifySettleAt(pos) {
+    var pl = $(':radio[name="player"]:checked').val()
+    var splits = window.location.hash.split('_');
+    var settleMap = {};
+    var roadMap = {};
+    var i;
+
+    for (i = 3; i < splits.length; ++i) {
+      var settle = splits[i];
+      var c = settle.charAt(0);
+      var settlePos = parseInt(settle.substr(1));
+
+      if (c === ID_RED_ROAD || c === ID_BLUE_ROAD || c === ID_ORANGE_ROAD || c === ID_WHITE_ROAD) {
+        roadMap[settlePos] = settle;
+      } else {
+        settleMap[settlePos] = settle;
+      }
+    }
+
+    if (pl === "red") {
+      if (_.has(settleMap, pos)) {
+        var settle = settleMap[pos];
+        var type = settle.charAt(0);
+        if (type === ID_RED_SETTLE) {
+          settleMap[pos] = ID_RED_CITY + pos;
+        } else {
+          delete settleMap[pos];
+        }
+      } else {
+        settleMap[pos] = ID_RED_SETTLE + pos;
+      }
+    } else if (pl === "blue") {
+      if (_.has(settleMap, pos)) {
+        var settle = settleMap[pos];
+        var type = settle.charAt(0);
+        if (type === ID_BLUE_SETTLE) {
+          settleMap[pos] = ID_BLUE_CITY + pos;
+        } else {
+          delete settleMap[pos];
+        }
+      } else {
+        settleMap[pos] = ID_BLUE_SETTLE + pos;
+      }
+    } else if (pl === "orange") {
+      if (_.has(settleMap, pos)) {
+        var settle = settleMap[pos];
+        var type = settle.charAt(0);
+        if (type === ID_ORANGE_SETTLE) {
+          settleMap[pos] = ID_ORANGE_CITY + pos;
+        } else {
+          delete settleMap[pos];
+        }
+      } else {
+        settleMap[pos] = ID_ORANGE_SETTLE + pos;
+      }
+    } else if (pl === "white") {
+      if (_.has(settleMap, pos)) {
+        var settle = settleMap[pos];
+        var type = settle.charAt(0);
+        if (type === ID_WHITE_SETTLE) {
+          settleMap[pos] = ID_WHITE_CITY + pos;
+        } else {
+          delete settleMap[pos];
+        }
+      } else {
+        settleMap[pos] = ID_WHITE_SETTLE + pos;
+      }
+    }
+
+    var hash = splits[0] + '_' + splits[1] + '_' + splits[2];
+    for (key in roadMap) {
+      hash += '_' + roadMap[key];
+    }
+    for (key in settleMap) {
+      hash += '_' + settleMap[key];
     }
 
     window.location.hash = hash;
@@ -535,6 +682,81 @@ function draw() {
         x, y, w, PLAYER_PARTS_Y);
   }
 
+  var drawRoad = function(pos, player) {
+    var coord;
+    var w;
+
+    if (pos < 6) {
+      coord = getSettleCoordAt(pos);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + (pos%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - (pos%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 10) {
+      coord = getSettleCoordAt((pos-6)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 18) {
+      coord = getSettleCoordAt(pos - 3);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-10)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-3)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+    } else if (pos < 23) {
+      coord = getSettleCoordAt(7 + (pos-18)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 33) {
+      coord = getSettleCoordAt(pos - 7);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-23)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-23)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 39) {
+      coord = getSettleCoordAt(16 + (pos-33)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 49) {
+      coord = getSettleCoordAt(pos - 12);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-41)%2 === 0 ? TILE_X/2 : 0), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-41)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+    } else if (pos < 54) {
+      coord = getSettleCoordAt(28 + (pos-49)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 62) {
+      coord = getSettleCoordAt(pos - 16);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+    } else if (pos < 66) {
+      coord = getSettleCoordAt(39 + (pos-62)*2);
+      w = ROAD_WIDTH;
+      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
+        w, TILE_Y/2,
+        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+    } else if (pos < 72) {
+      coord = getSettleCoordAt(pos - 19);
+      w = TILE_X/2;
+      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
+        w, PLAYER_PARTS_Y,
+        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+
+    }
+    
+  }
+
   sprite.onload = function() {
     var map = window.location.hash;
 
@@ -622,6 +844,18 @@ function draw() {
           break;
         case ID_WHITE_CITY:
           drawSettlement(pos, PL_WHITE, true);
+          break;
+        case ID_RED_ROAD:
+          drawRoad(pos, PL_RED);
+          break;
+        case ID_BLUE_ROAD:
+          drawRoad(pos, PL_BLUE);
+          break;
+        case ID_ORANGE_ROAD:
+          drawRoad(pos, PL_ORANGE);
+          break;
+        case ID_WHITE_ROAD:
+          drawRoad(pos, PL_WHITE);
           break;
       }
     }
