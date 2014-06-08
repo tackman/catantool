@@ -71,6 +71,8 @@ const ABC_INNER_GRAPH = {4:8, 8:13, 13:14, 14:10, 10:5, 5:4};
 const ABC_OUTER_INNER_GRAPH = {1:4, 3:8, 12:13, 17:14, 15:10, 6:5};
 const ABC_BEGIN_POS = [0, 2, 7, 11, 16, 18];
 
+const PORT_PANELS = ["0ZZ3Z", "ZZ2ZZ", "0ZZ4Z", "ZZ5ZZ", "0ZZ1Z", "ZZ0ZZ"];
+
 
 var sprite = new Image();
 
@@ -92,7 +94,11 @@ jQuery(function($){
       }
     }
 
-    var portStr = "0ZZ1ZZZ2ZZ0ZZ3ZZ0ZZ4ZZ0ZZ5ZZZZ";
+    var ports = _.shuffle(PORT_PANELS);
+    var portStr = "";
+    for (i = 0; i < ports.length; ++i) {
+      portStr += ports[i];
+    }
     var hash = resStr + '_' + numStr + '_' + portStr;
     window.location.hash = hash;
     sprite.onload();
@@ -152,7 +158,12 @@ jQuery(function($){
       resStr += res[i];
     }
 
-    var portStr = "0ZZ1ZZZ2ZZ0ZZ3ZZ0ZZ4ZZ0ZZ5ZZZZ";
+    var ports = _.shuffle(PORT_PANELS);
+    var portStr = "";
+    for (i = 0; i < ports.length; ++i) {
+      portStr += ports[i];
+    }
+    
     var hash = resStr + '_' + nums + '_' + portStr;
     window.location.hash = hash;
     sprite.onload();
