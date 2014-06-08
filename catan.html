@@ -7,7 +7,9 @@
     <meta http-equiv="Content-Language" content="ja" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>カタンおやつツール</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
     <script type="text/javascript" src="underscore-min.js"></script>
     <script type="text/javascript" src="jquery-2.1.0.min.js"></script>
@@ -277,7 +279,8 @@ jQuery(function($){
  });
 
   function modifyRoadAt(pos) {
-    var pl = $(':radio[name="player"]:checked').val()
+    var pl = $('.btn-group > label.active > input[name=player]').val();
+    // var pl = $(':radio[name="player"]:checked').val()
     var splits = window.location.hash.split('_');
     var settleMap = {};
     var roadMap = {};
@@ -912,18 +915,28 @@ function getSettleCoordAt(pos) {
 </script>
   </head>
   <body>
-    <h2>ζ*'ヮ')ζ＜今日のおやつよ〜</h1>
-    <div>
+
+  <div class="container">
+  <div class="page-header">
+    <h2>ζ*'ヮ')ζ＜今日のおやつよ〜</h2>
+  </div>
+    <p>
       <canvas id="canvas" width="800" height="640"></canvas>
+    </p>
+
+    <p>
+    <div class="btn-group" data-toggle="buttons">
+      <label class="btn btn-danger"><input type="radio" name="player" value="red" />1番手</label>
+      <label class="btn btn-primary"><input type="radio" name="player" value="blue" />2番手</label>
+      <label class="btn btn-warning"><input type="radio" name="player" value="orange" />3番手</label>
+      <label class="btn btn-default"><input type="radio" name="player" value="white" />4番手</label>
     </div>
-    <div>
-      <input type="button" value="ランダム配置" id="random" />　<input type="button" value="ABC配置" id="abc" />
-    </div>
-    <div>
-      生産力設定 <input type="text" id="number" disabled="disabled">
-    </div>
-    <div>
-      資源設定 <select id="resource" disabled="disabled">
+    </p>
+
+    <p>
+      <input type="button" class="btn btn-default btn-large" value="ランダム配置" id="random" />　<input type="button" class="btn btn-default btn-large" value="ABC配置" id="abc" />
+      　資源設定 <input type="text" id="number" disabled="disabled" class="input-small">　
+      <select id="resource" disabled="disabled">
       <option value="0">海</option>
       <option value="1">土</option>
       <option value="2">鉄</option>
@@ -933,21 +946,16 @@ function getSettleCoordAt(pos) {
       <option value="6">砂漠</option>
 
       </select>
-    </div>
+    </p>
 
-    <div>
-    <form id="player">
-      <input type="radio" name="player" value="red" /><img src="img/red.png" />　
-      <input type="radio" name="player" value="blue" /><img src="img/blue.png" />　
-      <input type="radio" name="player" value="orange" /><img src="img/orange.png" />　
-      <input type="radio" name="player" value="white" /><img src="img/white.png" />
-    </form>
-    </div>
+   <div id="footer">
+      <div class="container">
+        <p class="text-muted">This software is using following open source softwares: <a href="http://jquery.com/">jQuery-2.1.0</a> <a href="http://underscorejs.org/">underscore.js</a> <a href="http://getbootstrap.com/">Twitter Bootstrap 3.1.1</a>
+</p>
+      </div>
+  </div>
+  </div>  <!-- container -->
 
-    <pre>
-      This software is using following open source softwares:
-      ・jQuery
-      ・underscore.js
-    </pre>
+   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
   </body>
 </html>
