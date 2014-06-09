@@ -21,6 +21,8 @@ const TILE_Y = 116; // スプライトのY辺
 const DY = 87;  // TILE_Y*(3/4) 偶数行の島タイルの上辺のスクリーン上端からのオフセット  
 const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ  
 const NUM_X = 30; // 生産力数字 
+const NUM_Y = 31;
+const NUM_OFFSET = 122;
 const PORT_LINE = 20; // 港の線の長さ
 const SQRT3 = 1.73;
 const CITY_X = 40;
@@ -522,34 +524,34 @@ function draw() {
     var y;
     if (pos < 3) {
       y = 1;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + 0.5 + pos)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 7) {
       y = 2;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + pos-3)*TILE_X - 0.5*NUM_X,
         (y/2)*VY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 12) {
       y = 3;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (1 + 0.5 + pos-7)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 16) {
       y = 4;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + pos-12)*TILE_X - 0.5*NUM_X,
         (y/2)*VY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else {
       y = 5;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + 0.5 + pos-16)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     }
   }
 
