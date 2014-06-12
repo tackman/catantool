@@ -21,13 +21,15 @@ const TILE_Y = 116; // スプライトのY辺
 const DY = 87;  // TILE_Y*(3/4) 偶数行の島タイルの上辺のスクリーン上端からのオフセット  
 const VY = 174; // 奇数行と偶数行の1セットでのY方向の長さ  
 const NUM_X = 30; // 生産力数字 
+const NUM_Y = 31;
+const NUM_OFFSET = 122;
 const PORT_LINE = 20; // 港の線の長さ
 const SQRT3 = 1.73;
 const CITY_X = 40;
 const SETTLE_X = 32;
 const PLAYER_PARTS_X = 173;
 const PLAYER_PARTS_Y = 30;
-const PLAYER_SY = 116+30;
+const PLAYER_SY = 116+30+15;
 const ROAD_OFFSET_X = 700;
 const ROAD_OFFSET_Y = 29;
 const ROAD_WIDTH = 10;
@@ -66,6 +68,7 @@ const PL_RED = 0;
 const PL_BLUE = 1;
 const PL_ORANGE = 2;
 const PL_WHITE = 3;
+const PL_COLORS = ['#ee1122', '#1122ee', '#ee9911', '#11bb11'];
 
 const ABC_LIST = [3, 0, 4, 1, 5, 7, 6, 9, 8, 2, 5, 7, 6, 2, 3, 4, 1, 8];
 const ABC_OUTER_GRAPH = {0:3, 3:7 , 7:12, 12:16, 16:17, 17:18, 18:15, 15:11, 11:6, 6:2, 2:1, 1:0};
@@ -504,9 +507,9 @@ function draw() {
   var drawElem = function(x, y, id) {
     if (y % 2 === 0) {
       if (y === 0) {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, 0, TILE_X, TILE_Y);
+        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, 0, TILE_X + 1, TILE_Y);
       } else {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X, TILE_Y);
+        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X + 1, TILE_Y);
       }
     } else {
       ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, x*TILE_X, ((y-1)/2)*VY + DY, TILE_X, TILE_Y);
@@ -522,34 +525,34 @@ function draw() {
     var y;
     if (pos < 3) {
       y = 1;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + 0.5 + pos)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 7) {
       y = 2;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + pos-3)*TILE_X - 0.5*NUM_X,
         (y/2)*VY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 12) {
       y = 3;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (1 + 0.5 + pos-7)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else if (pos < 16) {
       y = 4;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + pos-12)*TILE_X - 0.5*NUM_X,
         (y/2)*VY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     } else {
       y = 5;
-      ctx.drawImage(sprite, numX * NUM_X, TILE_Y, NUM_X, NUM_X, 
+      ctx.drawImage(sprite, numX * NUM_X, NUM_OFFSET, NUM_X, NUM_Y, 
         (2 + 0.5 + pos-16)*TILE_X - 0.5*NUM_X,
         ((y-1)/2)*VY + DY + 0.5*TILE_Y - 0.5*NUM_X,
-        NUM_X, NUM_X);
+        NUM_X, NUM_Y);
     }
   }
 
@@ -696,79 +699,57 @@ function draw() {
         x, y, w, PLAYER_PARTS_Y);
   }
 
+  function drawLine(sx, sy, dx, dy, player) {
+    ctx.strokeStyle = PL_COLORS[player];
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(dx, dy);
+    ctx.closePath;
+    ctx.lineWidth = 10;
+    ctx.stroke();
+  }
+
   var drawRoad = function(pos, player) {
     var coord;
+    var coordNext;
     var w;
 
     if (pos < 6) {
       coord = getSettleCoordAt(pos);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + (pos%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - (pos%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+      coordNext = getSettleCoordAt(pos + 1);
     } else if (pos < 10) {
       coord = getSettleCoordAt((pos-6)*2);
-      w = ROAD_WIDTH;
-      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
-        w, TILE_Y/2,
-        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+      coordNext = getSettleCoordAt((pos-6)*2 + 8);
     } else if (pos < 18) {
       coord = getSettleCoordAt(pos - 3);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-10)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - ((pos-3)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+      coordNext = getSettleCoordAt(pos - 2);
     } else if (pos < 23) {
       coord = getSettleCoordAt(7 + (pos-18)*2);
-      w = ROAD_WIDTH;
-      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
-        w, TILE_Y/2,
-        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+      coordNext = getSettleCoordAt(7 + (pos-18)*2 + 10);
     } else if (pos < 33) {
       coord = getSettleCoordAt(pos - 7);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-23)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - ((pos-23)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+      coordNext = getSettleCoordAt(pos - 6);
     } else if (pos < 39) {
       coord = getSettleCoordAt(16 + (pos-33)*2);
-      w = ROAD_WIDTH;
-      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
-        w, TILE_Y/2,
-        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+      coordNext = getSettleCoordAt(16 + (pos-33)*2 + 11);
     } else if (pos < 49) {
       coord = getSettleCoordAt(pos - 12);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-41)%2 === 0 ? TILE_X/2 : 0), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - ((pos-41)%2 === 0 ? 0 : ROAD_OFFSET_Y), w, PLAYER_PARTS_Y);
+      coordNext = getSettleCoordAt(pos - 11);
     } else if (pos < 54) {
       coord = getSettleCoordAt(28 + (pos-49)*2);
-      w = ROAD_WIDTH;
-      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
-        w, TILE_Y/2,
-        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+      coordNext = getSettleCoordAt(28 + (pos-49)*2 + 10);
     } else if (pos < 62) {
       coord = getSettleCoordAt(pos - 16);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
+      coordNext = getSettleCoordAt(pos - 15);
     } else if (pos < 66) {
       coord = getSettleCoordAt(39 + (pos-62)*2);
-      w = ROAD_WIDTH;
-      ctx.drawImage(sprite, ROAD_OFFSET_X + ROAD_WIDTH*player, ROAD_OFFSET_Y,
-        w, TILE_Y/2,
-        coord.x - ROAD_WIDTH/2, coord.y, w, TILE_Y/2);
+      coordNext = getSettleCoordAt(39 + (pos-62)*2 + 8);
     } else if (pos < 72) {
       coord = getSettleCoordAt(pos - 19);
-      w = TILE_X/2;
-      ctx.drawImage(sprite, PLAYER_PARTS_X*player + ((pos-57)%2 === 0 ? 0 : TILE_X/2), PLAYER_SY,
-        w, PLAYER_PARTS_Y,
-        coord.x, coord.y - ((pos-57)%2 === 0 ? ROAD_OFFSET_Y : 0), w, PLAYER_PARTS_Y);
-
+      coordNext = getSettleCoordAt(pos - 18);
     }
-    
+
+    drawLine(coord.x, coord.y, coordNext.x, coordNext.y, player);
   }
 
   sprite.onload = function() {
@@ -929,7 +910,7 @@ function getSettleCoordAt(pos) {
       <label class="btn btn-danger"><input type="radio" name="player" value="red" />1番手</label>
       <label class="btn btn-primary"><input type="radio" name="player" value="blue" />2番手</label>
       <label class="btn btn-warning"><input type="radio" name="player" value="orange" />3番手</label>
-      <label class="btn btn-default"><input type="radio" name="player" value="white" />4番手</label>
+      <label class="btn btn-success"><input type="radio" name="player" value="white" />4番手</label>
     </div>
     </p>
 
