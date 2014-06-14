@@ -51,6 +51,13 @@ const ID_DESERT = 6;
 const PROD_OFFSET = 21;
 const RES_OFFSET = 1;
 
+const PORT1_OFFSET = 200;
+const PORT2_OFFSET = 325;
+const PORT3_OFFSET = 449;
+const PORT4_OFFSET = 573;
+const PORT5_OFFSET = 699;
+const PORT6_OFFSET = 824;
+
 const ID_RED_SETTLE = 'A';
 const ID_RED_CITY = 'B';
 const ID_BLUE_SETTLE = 'C';
@@ -505,14 +512,15 @@ function draw() {
   sprite.src = 'img/sprite.png';
 
   var drawElem = function(x, y, id) {
+    var dh = TILE_Y + 2;
     if (y % 2 === 0) {
       if (y === 0) {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, 0, TILE_X + 1, TILE_Y);
+        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, 0, TILE_X + 1, dh);
       } else {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X + 1, TILE_Y);
+        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X + 1, dh);
       }
     } else {
-      ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, TILE_Y, x*TILE_X, ((y-1)/2)*VY + DY, TILE_X, TILE_Y);
+      ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, x*TILE_X, ((y-1)/2)*VY + DY, TILE_X, dh);
     }
   }
 
@@ -557,133 +565,45 @@ function draw() {
   }
 
   var drawPort = function(pos, id) {
-    var baseX1, baseY1, baseX2, baseY2, posX, lineX1, lineY1, lineX2, lineY2, iconX, sign;
+    var sx,sy,dx,dy,sw,sh,dw,dh;
 
-    ctx.beginPath();
-    if (pos < 6) {
-      if (pos % 2 === 0) {
-        ctx.moveTo(2 * TILE_X + (pos/2)*TILE_X, TILE_Y);
-        ctx.lineTo(2 * TILE_X + (pos/2)*TILE_X, TILE_Y - PORT_LINE);
-        ctx.moveTo(2.5 * TILE_X + (pos/2)*TILE_X, DY);
-        ctx.lineTo(2.5 * TILE_X + (pos/2)*TILE_X - SQRT3*PORT_LINE/2, DY - PORT_LINE/2);
+    sw = TILE_X;
+    sh = TILE_Y;
+    dw = TILE_X;
+    dh = TILE_Y;
+    sx = id * TILE_X;
 
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          2 * TILE_X + (pos/2)*TILE_X - NUM_X/2 + TILE_X/8 ,
-          2 * TILE_Y/3 - NUM_X/2,
-          NUM_X, NUM_X);
-      } else {
-        --pos;
-        ctx.moveTo((2.5 + pos/2)*TILE_X , DY);
-        ctx.lineTo((2.5 + pos/2 )*TILE_X + SQRT3*PORT_LINE/2, DY - PORT_LINE/2);
-        ctx.moveTo((3 + pos/2)*TILE_X, TILE_Y);
-        ctx.lineTo((3 + pos/2)*TILE_X, TILE_Y - PORT_LINE);
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          2.5*TILE_X + (pos/2)*TILE_X - NUM_X/2 + TILE_X*0.4,
-          2 * TILE_Y/3 - NUM_X/2,
-          NUM_X, NUM_X);
-      }
-    } else if (pos < 16) {
-      if (pos % 2 === 0) {
-        ctx.moveTo(6*TILE_X - Math.abs(pos-10)*0.25*TILE_X, TILE_Y + (pos-6)*0.5*DY);
-        ctx.lineTo(6*TILE_X - Math.abs(pos-10)*0.25*TILE_X + PORT_LINE/2*SQRT3, TILE_Y + (pos-6)*0.5*DY + PORT_LINE/2);
-        ctx.moveTo(6*TILE_X - Math.abs(pos-10)*0.25*TILE_X, TILE_Y + (pos-6)*0.5*DY + TILE_Y/2);
-        ctx.lineTo(6*TILE_X - Math.abs(pos-10)*0.25*TILE_X + PORT_LINE/2*SQRT3, TILE_Y + (pos-6)*0.5*DY + TILE_Y/2 - PORT_LINE/2);
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          6*TILE_X - Math.abs(pos-10)*0.25*TILE_X + TILE_X/5,
-          TILE_Y + (pos-6)*0.5*DY + TILE_Y/4 - NUM_X/2,
-          NUM_X, NUM_X);
-      } else {
-        posX = pos - 1;
-        baseX1 = 6*TILE_X - 0.5*(Math.abs(posX-10)/2)*TILE_X;
-        baseY1 = TILE_Y + TILE_Y/2 + DY*(pos-7)/2;
-        baseX2 = 6*TILE_X - 0.5*(Math.abs(posX-10)/2)*TILE_X + TILE_X/2 - (pos < 10 ? 0 : TILE_X);
-        baseY2 = TILE_Y + (pos-5)*DY/2;
-        lineX1 = pos < 10 ? PORT_LINE/2*SQRT3 : 0;
-        lineY1 = pos < 10 ? -PORT_LINE/2 : PORT_LINE;
-        lineX2 = pos < 10 ? 0 : PORT_LINE*SQRT3/2;
-        lineY2 = pos < 10 ? -PORT_LINE : PORT_LINE/2;
-        iconX = pos < 10 ? 0 : -TILE_X/2;
-
-        sign = pos < 10 ? 1 : -1;
-        ctx.moveTo(baseX1, baseY1);
-        ctx.lineTo(baseX1 + lineX1, baseY1 + lineY1);
-        ctx.moveTo(baseX2, baseY2);
-        ctx.lineTo(baseX2 + lineX2, baseY2 + lineY2);
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-            baseX1 + TILE_X*0.36 - NUM_X/2 + iconX,
-            baseY1 - (TILE_Y/20 + NUM_X/2)*sign,
-            NUM_X, NUM_X);
-      } 
-    } else if (pos < 21) {
-      if (pos % 2 === 1) {
-        baseX1 = 4*TILE_X - ((pos-17)/2)*TILE_X;
-        baseY1 = 6*DY;
-        baseX2 = baseX1 - TILE_X/2;
-        baseY2 = 5*DY + TILE_Y;
-
-        ctx.moveTo(baseX1, baseY1);
-        ctx.lineTo(baseX1, baseY1 + PORT_LINE);
-        ctx.moveTo(baseX2, baseY2);
-        ctx.lineTo(baseX2 + SQRT3*PORT_LINE/2, baseY2 + PORT_LINE/2);
-
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          baseX1 - NUM_X/2 - 0.12*TILE_X,
-          baseY1 - NUM_X/2 + TILE_Y/3,
-          NUM_X, NUM_X);
-      } else {
-        baseX1 = 4.5*TILE_X - (pos-16)/2*TILE_X;
-        baseY1 = 5*DY + TILE_Y;
-        baseX2 = baseX1 - TILE_X/2;
-        baseY2 = 6*DY;
-
-        ctx.moveTo(baseX1 , baseY1);
-        ctx.lineTo(baseX1 - PORT_LINE*SQRT3/2, baseY1 + PORT_LINE/2);
-        ctx.moveTo(baseX2, baseY2);
-        ctx.lineTo(baseX2, baseY2 + PORT_LINE);
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          baseX1 - NUM_X/2 - TILE_X*0.4,
-          baseY1 - NUM_X/2 + TILE_Y*0.08,
-          NUM_X, NUM_X);
-      }
-    } else {
-      if (pos%2 === 1) {
-        baseX1 = 1*TILE_X + Math.abs(25-pos)*0.25*TILE_X;
-        baseY1 = TILE_Y + (29-pos)*0.5*DY;
-        ctx.moveTo(baseX1, baseY1);
-        ctx.lineTo(baseX1 - PORT_LINE/2*SQRT3, baseY1 + PORT_LINE/2);
-        ctx.moveTo(baseX1, baseY1 + TILE_Y/2);
-        ctx.lineTo(baseX1 - PORT_LINE/2*SQRT3, baseY1 + TILE_Y/2 - PORT_LINE/2);
-        ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-          baseX1 - TILE_X*0.4,
-          baseY1 + TILE_Y/4 - NUM_X/2,
-          NUM_X, NUM_X);
-      } else {
-          posX = pos - 1;
-          sign = pos < 25 ? 1 : -1;
-
-          baseX1 = TILE_X + 0.5*(Math.abs(posX-25)/2)*TILE_X;
-          baseY1 = TILE_Y + DY*(28-pos)/2 + DY;
-          baseX2 = baseX1 - sign*TILE_X/2;
-          baseY2 = baseY1 - TILE_Y/4;
-          lineX1 = pos < 25 ? -PORT_LINE/2*SQRT3 : 0;
-          lineY1 = pos < 25 ? PORT_LINE/2 : -PORT_LINE;
-          lineX2 = pos < 25 ? 0 : -PORT_LINE*SQRT3/2;
-          lineY2 = pos < 25 ? PORT_LINE : -PORT_LINE/2;
-          ctx.moveTo(baseX1, baseY1);
-          ctx.lineTo(baseX1 + lineX1, baseY1 + lineY1);
-          ctx.moveTo(baseX2, baseY2);
-          ctx.lineTo(baseX2 + lineX2, baseY2 + lineY2);
-          ctx.drawImage(sprite, NUM_X*(10+id), TILE_Y, NUM_X, NUM_X,
-            baseX1 - (pos < 25 ? TILE_X*0.5 : 0),
-            baseY1 - NUM_X*1.5 + (pos < 25 ? NUM_X : 0),
-            NUM_X, NUM_X);
-
-        
-      }
+    if (pos <= 5) {
+      sy = pos % 2 === 0 ? PORT1_OFFSET : PORT2_OFFSET;
+      dx = 1.5*TILE_X + Math.floor((pos+1)/2)*TILE_X;
+      dy = 0;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    } else if (pos <= 10) {
+      sy = (pos-6) % 2 === 0 ? PORT3_OFFSET : PORT2_OFFSET;
+      dx = 5*TILE_X + Math.floor((pos-6)/2) * 0.5*TILE_X;
+      dy = DY + Math.floor((pos-6)/2) * DY;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    } else if (pos <= 14) {
+      sy = (pos-11) % 2 === 0 ? PORT4_OFFSET : PORT3_OFFSET;
+      dx = 5.5*TILE_X - Math.floor((pos-10)/2) * 0.5*TILE_X;
+      dy = 2*VY + Math.floor((pos-10)/2) * DY;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    } else if (pos <= 20) {
+      sy = (pos-15) % 2 === 0 ? PORT4_OFFSET : PORT5_OFFSET;
+      dx = 4.5*TILE_X - Math.floor((pos-14)/2) * TILE_X;
+      dy = (pos-15) % 2 === 0 ? 3*VY : 2*VY + TILE_Y*1.5;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    } else if (pos <= 25) {
+      sy = (pos-20) % 2 === 0 ? PORT6_OFFSET : PORT5_OFFSET;
+      dx = 1.5*TILE_X - Math.floor((pos-20)/2) * 0.5*TILE_X;
+      dy = 3*VY - Math.floor((pos-20)/2) * DY;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+    } else if (pos <= 29) {
+      sy = (pos-26) % 2 === 0 ? PORT1_OFFSET : PORT6_OFFSET;
+      dx = 0.5*TILE_X + Math.floor((pos-26)/2) * 0.5*TILE_X;
+      dy = VY - Math.floor((pos-26)/2) * DY;
+      ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     }
-
-    ctx.closePath();
-    ctx.stroke();
 
   }
 
@@ -775,6 +695,15 @@ function draw() {
     drawElem(1, 5, ID_SEA);
     drawElem(5, 5, ID_SEA);
 
+    for (i = 41; i < 41+30; ++i) {
+      var p = map.charAt(i);
+      if (isNaN(p)) {
+        continue;
+      }
+      var pn = parseInt(p);
+      drawPort(i-41, pn);
+    }
+
     // 資源タイルの表示
     for (i = 1; i <= 19; ++i) {
       var c = map.charAt(i);
@@ -798,15 +727,6 @@ function draw() {
         continue;
       }
       drawNumber(i-21, n);
-    }
-
-    for (i = 41; i < 41+30; ++i) {
-      var p = map.charAt(i);
-      if (isNaN(p)) {
-        continue;
-      }
-      var pn = parseInt(p);
-      drawPort(i-41, pn);
     }
 
     var pos;
@@ -902,7 +822,7 @@ function getSettleCoordAt(pos) {
     <h2>ζ*'ヮ')ζ＜今日のおやつよ〜</h2>
   </div>
     <p>
-      <canvas id="canvas" width="800" height="640"></canvas>
+      <canvas id="canvas" width="800" height="660"></canvas>
     </p>
 
     <p>
