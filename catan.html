@@ -573,30 +573,30 @@ function draw() {
     dh = TILE_Y;
     sx = id * TILE_X;
 
-    if (pos <= 5) {
+    if (pos <= 4) {
       sy = pos % 2 === 0 ? PORT1_OFFSET : PORT2_OFFSET;
       dx = 1.5*TILE_X + Math.floor((pos+1)/2)*TILE_X;
       dy = 0;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 10) {
-      sy = (pos-6) % 2 === 0 ? PORT3_OFFSET : PORT2_OFFSET;
+    } else if (pos <= 9) {
+      sy = (pos-5) % 2 === 0 ? PORT2_OFFSET : PORT3_OFFSET;
       dx = 5*TILE_X + Math.floor((pos-6)/2) * 0.5*TILE_X;
       dy = DY + Math.floor((pos-6)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     } else if (pos <= 14) {
-      sy = (pos-11) % 2 === 0 ? PORT4_OFFSET : PORT3_OFFSET;
-      dx = 5.5*TILE_X - Math.floor((pos-10)/2) * 0.5*TILE_X;
-      dy = 2*VY + Math.floor((pos-10)/2) * DY;
+      sy = (pos-10) % 2 === 0 ? PORT3_OFFSET : PORT4_OFFSET;
+      dx = 6*TILE_X - Math.floor((pos-9)/2) * 0.5*TILE_X;
+      dy = VY + DY + Math.floor((pos-9)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 20) {
+    } else if (pos <= 19) {
       sy = (pos-15) % 2 === 0 ? PORT4_OFFSET : PORT5_OFFSET;
       dx = 4.5*TILE_X - Math.floor((pos-14)/2) * TILE_X;
       dy = (pos-15) % 2 === 0 ? 3*VY : 2*VY + TILE_Y*1.5;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 25) {
-      sy = (pos-20) % 2 === 0 ? PORT6_OFFSET : PORT5_OFFSET;
-      dx = 1.5*TILE_X - Math.floor((pos-20)/2) * 0.5*TILE_X;
-      dy = 3*VY - Math.floor((pos-20)/2) * DY;
+    } else if (pos <= 24) {
+      sy = (pos-20) % 2 === 0 ? PORT5_OFFSET : PORT6_OFFSET;
+      dx = 1.5*TILE_X - Math.floor((pos-19)/2) * 0.5*TILE_X;
+      dy = 3*VY - Math.floor((pos-19)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     } else if (pos <= 29) {
       sy = (pos-26) % 2 === 0 ? PORT1_OFFSET : PORT6_OFFSET;
