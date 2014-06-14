@@ -51,12 +51,12 @@ const ID_DESERT = 6;
 const PROD_OFFSET = 21;
 const RES_OFFSET = 1;
 
-const PORT1_OFFSET = 200;
-const PORT2_OFFSET = 325;
-const PORT3_OFFSET = 449;
-const PORT4_OFFSET = 573;
-const PORT5_OFFSET = 699;
-const PORT6_OFFSET = 824;
+const PORT1_OFFSET = 202;
+const PORT2_OFFSET = 327;
+const PORT3_OFFSET = 450;
+const PORT4_OFFSET = 576;
+const PORT5_OFFSET = 701;
+const PORT6_OFFSET = 828;
 
 const ID_RED_SETTLE = 'A';
 const ID_RED_CITY = 'B';
@@ -513,14 +513,16 @@ function draw() {
 
   var drawElem = function(x, y, id) {
     var dh = TILE_Y + 2;
+    var dw = TILE_X + 2;
+    var sy = 2;
     if (y % 2 === 0) {
       if (y === 0) {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, 0, TILE_X + 1, dh);
+        ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, TILE_X/2 +  x * TILE_X, 0, dw, dh);
       } else {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X + 1, dh);
+        ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, TILE_X/2 +  x * TILE_X, VY*(y/2), dw, dh);
       }
     } else {
-      ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, x*TILE_X, ((y-1)/2)*VY + DY, TILE_X, dh);
+      ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, x*TILE_X, ((y-1)/2)*VY + DY, dw, dh);
     }
   }
 
@@ -573,30 +575,30 @@ function draw() {
     dh = TILE_Y;
     sx = id * TILE_X;
 
-    if (pos <= 5) {
+    if (pos <= 4) {
       sy = pos % 2 === 0 ? PORT1_OFFSET : PORT2_OFFSET;
       dx = 1.5*TILE_X + Math.floor((pos+1)/2)*TILE_X;
       dy = 0;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 10) {
-      sy = (pos-6) % 2 === 0 ? PORT3_OFFSET : PORT2_OFFSET;
+    } else if (pos <= 9) {
+      sy = (pos-5) % 2 === 0 ? PORT2_OFFSET : PORT3_OFFSET;
       dx = 5*TILE_X + Math.floor((pos-6)/2) * 0.5*TILE_X;
       dy = DY + Math.floor((pos-6)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     } else if (pos <= 14) {
-      sy = (pos-11) % 2 === 0 ? PORT4_OFFSET : PORT3_OFFSET;
-      dx = 5.5*TILE_X - Math.floor((pos-10)/2) * 0.5*TILE_X;
-      dy = 2*VY + Math.floor((pos-10)/2) * DY;
+      sy = (pos-10) % 2 === 0 ? PORT3_OFFSET : PORT4_OFFSET;
+      dx = 6*TILE_X - Math.floor((pos-9)/2) * 0.5*TILE_X;
+      dy = VY + DY + Math.floor((pos-9)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 20) {
+    } else if (pos <= 19) {
       sy = (pos-15) % 2 === 0 ? PORT4_OFFSET : PORT5_OFFSET;
       dx = 4.5*TILE_X - Math.floor((pos-14)/2) * TILE_X;
       dy = (pos-15) % 2 === 0 ? 3*VY : 2*VY + TILE_Y*1.5;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
-    } else if (pos <= 25) {
-      sy = (pos-20) % 2 === 0 ? PORT6_OFFSET : PORT5_OFFSET;
-      dx = 1.5*TILE_X - Math.floor((pos-20)/2) * 0.5*TILE_X;
-      dy = 3*VY - Math.floor((pos-20)/2) * DY;
+    } else if (pos <= 24) {
+      sy = (pos-20) % 2 === 0 ? PORT5_OFFSET : PORT6_OFFSET;
+      dx = 1.5*TILE_X - Math.floor((pos-19)/2) * 0.5*TILE_X;
+      dy = 3*VY - Math.floor((pos-19)/2) * DY;
       ctx.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
     } else if (pos <= 29) {
       sy = (pos-26) % 2 === 0 ? PORT1_OFFSET : PORT6_OFFSET;
