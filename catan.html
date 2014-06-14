@@ -51,12 +51,12 @@ const ID_DESERT = 6;
 const PROD_OFFSET = 21;
 const RES_OFFSET = 1;
 
-const PORT1_OFFSET = 200;
-const PORT2_OFFSET = 325;
-const PORT3_OFFSET = 449;
-const PORT4_OFFSET = 573;
-const PORT5_OFFSET = 699;
-const PORT6_OFFSET = 824;
+const PORT1_OFFSET = 202;
+const PORT2_OFFSET = 327;
+const PORT3_OFFSET = 450;
+const PORT4_OFFSET = 576;
+const PORT5_OFFSET = 701;
+const PORT6_OFFSET = 828;
 
 const ID_RED_SETTLE = 'A';
 const ID_RED_CITY = 'B';
@@ -513,14 +513,16 @@ function draw() {
 
   var drawElem = function(x, y, id) {
     var dh = TILE_Y + 2;
+    var dw = TILE_X + 2;
+    var sy = 2;
     if (y % 2 === 0) {
       if (y === 0) {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, 0, TILE_X + 1, dh);
+        ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, TILE_X/2 +  x * TILE_X, 0, dw, dh);
       } else {
-        ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, TILE_X/2 +  x * TILE_X, VY*(y/2), TILE_X + 1, dh);
+        ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, TILE_X/2 +  x * TILE_X, VY*(y/2), dw, dh);
       }
     } else {
-      ctx.drawImage(sprite, id * TILE_X, 0, TILE_X, dh, x*TILE_X, ((y-1)/2)*VY + DY, TILE_X, dh);
+      ctx.drawImage(sprite, id * TILE_X, sy, TILE_X, dh, x*TILE_X, ((y-1)/2)*VY + DY, dw, dh);
     }
   }
 
