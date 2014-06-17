@@ -491,11 +491,9 @@ jQuery(function($){
       sprite.onload();
     });
   }
-});
 
-onload = function() {
   draw();
-};
+  
 function draw() {
   /* canvas要素のノードオブジェクト */
   var canvas = document.getElementById('canvas');
@@ -812,6 +810,9 @@ function getSettleCoordAt(pos) {
 
   return {x: x, y: y};
 }
+
+});
+
 
 
 
