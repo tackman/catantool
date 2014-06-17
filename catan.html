@@ -775,8 +775,11 @@ function draw() {
       }
     }
 
-  }
+    var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("#カタンのおやつ 今日の島は〜 ") + "&url=" + encodeURIComponent(window.location.toString());
+    $("#tweet").attr("href", url);
+    console.log(url);
 
+  }
 
 }
 
@@ -850,6 +853,10 @@ function getSettleCoordAt(pos) {
       <option value="6">砂漠</option>
 
       </select>
+    </p>
+
+    <p>
+      <a id="tweet" target="_blank" class="btn btn-info btn-xs active" role="button" href="https://twitter.com/share">ツイート</a>
     </p>
 
    <div id="footer">
