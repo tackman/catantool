@@ -77,13 +77,14 @@ const PL_ORANGE = 2;
 const PL_WHITE = 3;
 const PL_COLORS = ['#ee1122', '#1122ee', '#ee9911', '#11bb11'];
 
+// 3:5,0:2,4:6,1:3,8,10,9
 const ABC_LIST = [3, 0, 4, 1, 5, 7, 6, 9, 8, 2, 5, 7, 6, 2, 3, 4, 1, 8];
 const ABC_OUTER_GRAPH = {0:3, 3:7 , 7:12, 12:16, 16:17, 17:18, 18:15, 15:11, 11:6, 6:2, 2:1, 1:0};
 const ABC_INNER_GRAPH = {4:8, 8:13, 13:14, 14:10, 10:5, 5:4};
 const ABC_OUTER_INNER_GRAPH = {1:4, 3:8, 12:13, 17:14, 15:10, 6:5};
 const ABC_BEGIN_POS = [0, 2, 7, 11, 16, 18];
 
-const PORT_PANELS = ["0ZZ3Z", "ZZ2ZZ", "0ZZ4Z", "ZZ5ZZ", "0ZZ1Z", "ZZ0ZZ"];
+const PORT_PANELS = ["0ZZ3Z", "ZZ0ZZ", "0ZZ1Z", "ZZ5ZZ", "0ZZ4Z", "ZZ2ZZ"];
 
 
 var sprite = new Image();
@@ -181,12 +182,81 @@ jQuery(function($){
     sprite.onload();
 
   });
+  //gpPubAbc
+  $("#gpPublicAbc").on("click", function(){
+    var res = _.shuffle([1,1,1, 2,2,2, 3,3,3,3, 4,4,4,4, 5,5,5,5, 6]);
+    //羊港側固定
+    var pos = 2;
+    var nums = "011223344556677889D";
+    var set = {};
+    var i = 0;
+
+    for(;;) {
+      if (res[pos] !== ID_DESERT) {
+        nums = setCharAt(nums, pos, ABC_LIST[i]);
+        ++i;
+      } else {
+        nums = setCharAt(nums, pos, 'D');
+      }
+
+      set[pos] = true;
+
+      if (_.has(set, ABC_OUTER_GRAPH[pos])) {
+        break;
+      } else {
+        pos = ABC_OUTER_GRAPH[pos];
+      }
+    }
+
+    pos = ABC_OUTER_INNER_GRAPH[pos];
+
+    for (;;) {
+      if (res[pos] !== ID_DESERT) {
+        nums = setCharAt(nums, pos, ABC_LIST[i]);
+        ++i;
+      } else {
+        nums = setCharAt(nums, pos, 'D');
+      }
+
+      set[pos] = true;
+
+      if (_.has(set, ABC_INNER_GRAPH[pos])) {
+        break;
+      } else {
+        pos = ABC_INNER_GRAPH[pos];
+      }
+    }
+
+    if (i === 17) {
+      nums = setCharAt(nums, 9, ABC_LIST[i])
+    } else {
+      nums = setCharAt(nums, 9, 'D');
+    }
+
+    var resStr = "";
+    for (i = 0; i < 19; ++i) {
+      resStr += res[i];
+    }
+
+    var ports = PORT_PANELS;
+    var portStr = "";
+    for (i = 0; i < ports.length; ++i) {
+      portStr += ports[i];
+    }
+    
+    var hash = resStr + '_' + nums + '_' + portStr;
+    window.location.hash = hash;
+    sprite.onload();
+
+  });
 
   $("#clear").on("click", function(){
-    window.location.hash = window.location.hash.substr(0, 71);
+    window.location.hash = '';
     console.log(window.location.hash);
     sprite.onload();
   });
+
+
 
   $("#canvas").click(function(e){
 
@@ -780,9 +850,9 @@ function draw() {
       }
     }
 
-    var url = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("#カタンのおやつ 今日の島は〜 ") + "&url=" + encodeURIComponent(window.location.toString());
-    $("#tweet").attr("href", url);
-    console.log(url);
+    var tweetUrl = "https://twitter.com/intent/tweet?text=" + encodeURIComponent("#カタンのおやつ 今日の島は〜 ") + "&url=" + encodeURIComponent(window.location.toString());
+    $("#tweet").attr("href", tweetUrl);
+    console.log(tweetUrl);
 
   }
 
@@ -847,7 +917,9 @@ function getSettleCoordAt(pos) {
     </p>
 
     <p>
-      <input type="button" class="btn btn-default btn-large" value="ランダム配置" id="random" />　<input type="button" class="btn btn-default btn-large" value="ABC配置" id="abc" />
+      <input type="button" class="btn btn-default btn-large" value="ランダム配置" id="random" />
+      <input type="button" class="btn btn-default btn-large" value="ABC配置" id="abc" />
+      <input type="button" class="btn btn-default btn-large" value="GP公式ABC配置" id="gpPublicAbc" />
       　資源設定 <input type="text" id="number" disabled="disabled" class="input-small">　
       <select id="resource" disabled="disabled">
       <option value="0">海</option>
